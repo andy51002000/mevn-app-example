@@ -26,6 +26,7 @@ app.use(morgan('combined'))
 app.use(bodyParser.json())
 app.use(cors())
 
+//read
 app.get('/posts', (req, res) => {
   Post.find({}, 'title description', function (error, posts) {
     if (error) { console.error(error); }
@@ -35,8 +36,7 @@ app.get('/posts', (req, res) => {
   }).sort({_id:-1})
 })
 
-// Add new post
-
+//create
 app.post('/posts', (req, res) => {
 
   var db = req.db;
@@ -73,6 +73,37 @@ app.post('/posts', (req, res) => {
 
   })
 
+})
+
+app.get('/post/:id',(req,res)=>{
+  var db = req.db;
+  Post.findById(req.params.id,'title description', (err,post)=>{
+    if(err){
+      console.error(err)
+    }
+    res.send(post)
+  })
+})
+
+//update
+app.put('/posts/:id',(req,res) =>{
+  var db = req.db;
+  Post.findById(req.params.id,'title description',(err,post)=>{
+    if(err){
+      console.error(err);
+    }
+
+    post.title = req.body.title;
+    post.description = req.body.description;
+    post.save( err=>{
+      if(err){
+        console.log(err)
+      }
+      res.send({
+        success:true
+      })
+    })
+  })
 })
 
 app.listen(process.env.PORT || 8081)
